@@ -32,7 +32,7 @@ export const AuthCallbackPage = () => {
     return (
       <div className="auth-shell">
         <div className="auth-shell-main">
-          <div className="centered">
+          <div className="auth-page auth-page--stacked">
             <div className="card">
               <h2>Sign-in failed</h2>
               <p className="muted">{error}</p>
@@ -40,9 +40,9 @@ export const AuthCallbackPage = () => {
                 Back to login
               </button>
             </div>
+            <footer className="site-footer">© 2026 Felix Tom</footer>
           </div>
         </div>
-        <footer className="site-footer">© 2026 Felix Tom</footer>
       </div>
     )
   }
@@ -50,11 +50,11 @@ export const AuthCallbackPage = () => {
   return (
     <div className="auth-shell">
       <div className="auth-shell-main">
-        <div className="centered">
+        <div className="auth-page auth-page--stacked">
           <div className="card">Finalizing your session...</div>
+          <footer className="site-footer">© 2026 Felix Tom</footer>
         </div>
       </div>
-      <footer className="site-footer">© 2026 Felix Tom</footer>
     </div>
   )
 }
