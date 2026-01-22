@@ -385,6 +385,14 @@ select {
   padding: 32px;
 }
 
+.auth-page--stacked {
+  min-height: auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
 .auth-shell {
   min-height: 100vh;
   display: flex;
@@ -397,6 +405,11 @@ select {
 
 .auth-shell .site-footer {
   margin-top: 12px;
+}
+
+.auth-page--stacked .site-footer {
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .auth-card {

@@ -31,7 +31,7 @@ export const LoginPage = () => {
   return (
     <div className="auth-shell">
       <div className="auth-shell-main">
-        <div className="auth-page">
+        <div className="auth-page auth-page--stacked">
           <div className="auth-card">
             <div className="auth-brand">Budget</div>
             <h1>Sign in with a magic link</h1>
@@ -55,9 +55,9 @@ export const LoginPage = () => {
             </form>
             {message && <div className="notice">{message}</div>}
           </div>
+          <footer className="site-footer">© 2026 Felix Tom</footer>
         </div>
       </div>
-      <footer className="site-footer">© 2026 Felix Tom</footer>
     </div>
   )
 }
