@@ -30,21 +30,31 @@ export const AuthCallbackPage = () => {
 
   if (error) {
     return (
-      <div className="centered">
-        <div className="card">
-          <h2>Sign-in failed</h2>
-          <p className="muted">{error}</p>
-          <button className="primary-button" onClick={() => navigate('/login')}>
-            Back to login
-          </button>
+      <div className="auth-shell">
+        <div className="auth-shell-main">
+          <div className="centered">
+            <div className="card">
+              <h2>Sign-in failed</h2>
+              <p className="muted">{error}</p>
+              <button className="primary-button" onClick={() => navigate('/login')}>
+                Back to login
+              </button>
+            </div>
+          </div>
         </div>
+        <footer className="site-footer">© 2026 Felix Tom</footer>
       </div>
     )
   }
 
   return (
-    <div className="centered">
-      <div className="card">Finalizing your session...</div>
+    <div className="auth-shell">
+      <div className="auth-shell-main">
+        <div className="centered">
+          <div className="card">Finalizing your session...</div>
+        </div>
+      </div>
+      <footer className="site-footer">© 2026 Felix Tom</footer>
     </div>
   )
 }

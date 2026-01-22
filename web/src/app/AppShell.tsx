@@ -36,6 +36,7 @@ export const AppShell = ({ children }: AppShellProps) => {
         </div>
       </header>
       <main className="app-main">{children}</main>
+      <footer className="site-footer">© 2026 Felix Tom</footer>
     </div>
   )
 }
