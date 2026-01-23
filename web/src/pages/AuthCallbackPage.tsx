@@ -7,25 +7,58 @@ export const AuthCallbackPage = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    let mounted = true
+    let timeoutId: number | undefined
+    let subscription: { unsubscribe: () => void } | null = null
+
     const finalize = async () => {
-      const params = new URLSearchParams(window.location.search)
-      const code = params.get('code')
+      const searchParams = new URLSearchParams(window.location.search)
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+      const errorMessage =
+        searchParams.get('error_description') ||
+        hashParams.get('error_description') ||
+        searchParams.get('error') ||
+        hashParams.get('error')
 
-      if (!code) {
-        setError('Missing auth code. Try signing in again.')
+      if (errorMessage) {
+        setError(decodeURIComponent(errorMessage))
         return
       }
 
-      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
-      if (exchangeError) {
-        setError(exchangeError.message)
+      const { data, error: sessionError } = await supabase.auth.getSession()
+      if (!mounted) return
+
+      if (sessionError) {
+        setError(sessionError.message)
         return
       }
 
-      navigate('/')
+      if (data.session) {
+        navigate('/')
+        return
+      }
+
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
+        if (!mounted || !next) return
+        navigate('/')
+      })
+
+      subscription = listener.subscription
+      timeoutId = window.setTimeout(() => {
+        if (!mounted) return
+        setError('Missing session. Try signing in again.')
+      }, 8000)
     }
 
     void finalize()
+
+    return () => {
+      mounted = false
+      subscription?.unsubscribe()
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId)
+      }
+    }
   }, [navigate])
 
   if (error) {
