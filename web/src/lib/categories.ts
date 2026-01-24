@@ -16,7 +16,7 @@ export const categories: Category[] = [
 ]
 
 export const starterRules: Record<Category, string[]> = {
-  'Eating Out': ['cafe', 'restaurant', 'lunch', 'dinner', 'brunch', 'coffee'],
+  'Eating Out': ['cafe', 'restaurant', 'lunch', 'dinner', 'brunch', 'coffee', 'dessert'],
   Housing: ['rent', 'mortgage', 'landlord', 'property'],
   Groceries: ['market', 'supermarket', 'parknshop', 'wellcome', 'grocery', 'groceries'],
   Transportation: ['mtr', 'taxi', 'uber', 'bus', 'train', 'octopus'],
