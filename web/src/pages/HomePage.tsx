@@ -12,7 +12,8 @@ import { buildRuleSet } from '../lib/categorize'
 import { convertToHkd } from '../lib/fx'
 import { monthLabelHk, monthStartHk, nextMonthStartHk, todayHk } from '../lib/hkTime'
 import { formatHkd } from '../lib/money'
-import { supabase } from '../lib/supabase'
+import { getLedgerStore } from '../lib/ledgerStore'
+import { isDemoMode } from '../lib/runtime'
 import type { Category, CategoryRuleRow, DraftEntry, TransactionRow } from '../lib/types'
 import { useAuth } from '../app/useAuth'
 import { QuickAddCard } from '../features/entry/QuickAddCard'
@@ -28,71 +29,50 @@ export const HomePage = () => {
   const [monthDate, setMonthDate] = useState(() => parseISO(todayHk()))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const store = useMemo(() => getLedgerStore(), [])
+  const userId = isDemoMode ? 'demo' : user?.id
 
   const ruleSet = useMemo(() => buildRuleSet(rules), [rules])
 
-  const loadRules = async () => {
-    const { data } = await supabase.from('category_rules').select('*')
-    setRules((data ?? []) as CategoryRuleRow[])
-  }
+  const loadRules = useCallback(async () => {
+    if (!userId) return
+    const data = await store.listRules(userId)
+    setRules(data)
+  }, [store, userId])
 
   const loadTransactions = useCallback(async () => {
-    if (!user) return
+    if (!userId) return
     const monthStart = monthStartHk(monthDate)
     const nextMonthStart = nextMonthStartHk(monthDate)
 
-    const { data, error: fetchError } = await supabase
-      .from('transactions')
-      .select('*')
-      .gte('date', monthStart)
-      .lt('date', nextMonthStart)
-      .order('date', { ascending: false })
-      .order('created_at', { ascending: false })
-
-    if (fetchError) {
-      setError(fetchError.message)
-      return
+    try {
+      const data = await store.listTransactions(userId, monthStart, nextMonthStart)
+      setTransactions(data)
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError('Unable to load transactions.')
+      }
     }
-    setTransactions((data ?? []) as TransactionRow[])
-  }, [monthDate, user])
+  }, [monthDate, store, userId])
 
   useEffect(() => {
     void loadRules()
-  }, [])
+  }, [loadRules])
 
   useEffect(() => {
     void loadTransactions()
   }, [loadTransactions])
 
   const handleAddEntry = async (entry: DraftEntry) => {
-    if (!user) return
+    if (!userId) return
     setLoading(true)
     setError(null)
     try {
       const fx = await convertToHkd(entry.amount, entry.currency, entry.date)
-      const { data, error: insertError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: user.id,
-          date: entry.date,
-          item: entry.item,
-          category: entry.category,
-          original_amount: entry.amount,
-          original_currency: entry.currency,
-          hkd_amount: fx.hkdAmount,
-          fx_rate: fx.fxRate,
-          fx_date: fx.fxDate,
-        })
-        .select('*')
-        .single()
-
-      if (insertError) {
-        throw insertError
-      }
-
-      if (data) {
-        setTransactions((prev) => [data as TransactionRow, ...prev])
-      }
+      const data = await store.addTransaction(userId, entry, fx)
+      setTransactions((prev) => [data, ...prev])
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message)
@@ -105,13 +85,15 @@ export const HomePage = () => {
   }
 
   const handleDelete = async (id: string) => {
+    if (!userId) return
     if (!window.confirm('Delete this entry? This cannot be undone.')) return
-    await supabase.from('transactions').delete().eq('id', id)
+    await store.deleteTransaction(userId, id)
     setTransactions((prev) => prev.filter((tx) => tx.id !== id))
   }
 
   const handleUpdateCategory = async (id: string, category: Category) => {
-    await supabase.from('transactions').update({ category }).eq('id', id)
+    if (!userId) return
+    await store.updateTransactionCategory(userId, id, category)
     setTransactions((prev) =>
       prev.map((tx) => (tx.id === id ? { ...tx, category } : tx))
     )

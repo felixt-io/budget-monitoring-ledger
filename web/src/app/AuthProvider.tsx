@@ -1,21 +1,27 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { isDemoMode } from '../lib/runtime'
 import { AuthContext } from './authContext'
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
+  const demoMode = isDemoMode || !supabase
+  const [loading, setLoading] = useState(!demoMode)
 
   useEffect(() => {
+    if (demoMode || !supabase) {
+      return
+    }
+    const client = supabase
     let mounted = true
-    supabase.auth.getSession().then(({ data }) => {
+    client.auth.getSession().then(({ data }) => {
       if (!mounted) return
       setSession(data.session)
       setLoading(false)
     })
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
+    const { data: listener } = client.auth.onAuthStateChange((_event, next) => {
       if (!mounted) return
       setSession(next)
       setLoading(false)
@@ -25,7 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       mounted = false
       listener.subscription.unsubscribe()
     }
-  }, [])
+  }, [demoMode])
 
   const value = useMemo(
     () => ({

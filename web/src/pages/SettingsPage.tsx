@@ -1,47 +1,52 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { categories } from '../lib/categories'
-import { supabase } from '../lib/supabase'
+import { getLedgerStore } from '../lib/ledgerStore'
+import { isDemoMode } from '../lib/runtime'
 import type { Category, CategoryRuleRow } from '../lib/types'
+import { useAuth } from '../app/useAuth'
 
 export const SettingsPage = () => {
+  const { user } = useAuth()
   const [rules, setRules] = useState<CategoryRuleRow[]>([])
   const [selectedCategory, setSelectedCategory] = useState<Category>('Eating Out')
   const [keyword, setKeyword] = useState('')
   const [message, setMessage] = useState<string | null>(null)
+  const store = useMemo(() => getLedgerStore(), [])
+  const userId = isDemoMode ? 'demo' : user?.id
 
-  const loadRules = async () => {
-    const { data } = await supabase.from('category_rules').select('*').order('created_at')
-    setRules((data ?? []) as CategoryRuleRow[])
-  }
+  const loadRules = useCallback(async () => {
+    if (!userId) return
+    const data = await store.listRules(userId)
+    setRules(data)
+  }, [store, userId])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadRules()
-  }, [])
+  }, [loadRules])
 
   const handleAdd = async (event: FormEvent) => {
     event.preventDefault()
     const cleaned = keyword.trim().toLowerCase()
     if (!cleaned) return
 
-    const { error } = await supabase.from('category_rules').insert({
-      category: selectedCategory,
-      keyword: cleaned,
-    })
-
-    if (error) {
-      setMessage(error.message)
-      return
+    try {
+      await store.addRule(userId, selectedCategory, cleaned)
+      setKeyword('')
+      setMessage(null)
+      await loadRules()
+    } catch (err) {
+      if (err instanceof Error) {
+        setMessage(err.message)
+      } else {
+        setMessage('Unable to add rule.')
+      }
     }
-
-    setKeyword('')
-    setMessage(null)
-    await loadRules()
   }
 
   const handleDelete = async (id: string) => {
-    await supabase.from('category_rules').delete().eq('id', id)
+    await store.deleteRule(userId, id)
     await loadRules()
   }
 
@@ -51,7 +56,10 @@ export const SettingsPage = () => {
     <div className="settings-page">
       <div className="page-header">
         <h1>Settings</h1>
-        <p className="muted">Manage your category rules and exports.</p>
+        <p className="muted">
+          Manage your category rules and exports.
+          {isDemoMode && ' Demo data stays in this browser.'}
+        </p>
       </div>
 
       <section className="card">
@@ -106,16 +114,10 @@ export const SettingsPage = () => {
         <button
           className="ghost-button"
           onClick={async () => {
-            const [tx, rulesData] = await Promise.all([
-              supabase.from('transactions').select('*'),
-              supabase.from('category_rules').select('*'),
-            ])
+            const data = await store.exportJson(userId)
             const blob = new Blob([
               JSON.stringify(
-                {
-                  transactions: tx.data ?? [],
-                  rules: rulesData.data ?? [],
-                },
+                data,
                 null,
                 2
               ),
@@ -130,6 +132,17 @@ export const SettingsPage = () => {
         >
           Export JSON
         </button>
+        {isDemoMode && store.resetDemo && (
+          <button
+            className="ghost-button"
+            onClick={() => {
+              store.resetDemo?.()
+              void loadRules()
+            }}
+          >
+            Reset demo data
+          </button>
+        )}
       </section>
     </div>
   )

@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { isDemoMode } from '../lib/runtime'
 
 export const AuthCallbackPage = () => {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const demoMode = isDemoMode || !supabase
 
   useEffect(() => {
+    if (demoMode || !supabase) return
+    const client = supabase
     let mounted = true
     let timeoutId: number | undefined
     let subscription: { unsubscribe: () => void } | null = null
@@ -25,7 +29,7 @@ export const AuthCallbackPage = () => {
         return
       }
 
-      const { data, error: sessionError } = await supabase.auth.getSession()
+      const { data, error: sessionError } = await client.auth.getSession()
       if (!mounted) return
 
       if (sessionError) {
@@ -38,7 +42,7 @@ export const AuthCallbackPage = () => {
         return
       }
 
-      const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
+      const { data: listener } = client.auth.onAuthStateChange((_event, next) => {
         if (!mounted || !next) return
         navigate('/')
       })
@@ -59,7 +63,11 @@ export const AuthCallbackPage = () => {
         window.clearTimeout(timeoutId)
       }
     }
-  }, [navigate])
+  }, [demoMode, navigate])
+
+  if (demoMode) {
+    return <Navigate to="/" replace />
+  }
 
   if (error) {
     return (

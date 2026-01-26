@@ -4,12 +4,21 @@ A fast, everyday spending tracker for busy city life. The goal is simple: captur
 
 I built this with the same mindset I use for real estate, construction and project management: track resources, control variance, and keep decisions grounded in real numbers. Many personal finance apps hide basic workflows behind paid subscriptions. This project keeps the core workflow open, lightweight, and accessible to anyone from all walks of life.
 
+Live demo (no-login): https://budget-monitoring-ledger.vercel.app
+
 ## Highlights
 
 - **Natural language entry**: paste a single line like `68 usd sushi 2026-01-21`.
 - **Auto-categorization**: deterministic keyword rules you can inspect and extend.
 - **FX-aware ledger**: every entry stores the original amount and the HKD conversion.
 - **Exportable data**: download your transactions and rules as JSON.
+
+## Screenshots
+
+![Dashboard](docs/screenshots/dashboard.png)
+![Quick add](docs/screenshots/quick-add.png)
+![Transactions](docs/screenshots/transactions.png)
+![Settings rules](docs/screenshots/settings-rules.png)
 
 ## How auto-categorization works
 
@@ -47,6 +56,15 @@ Conversion logic lives in `web/src/lib/fx.ts`. Full details: `docs/currency-conv
 - React + Vite
 - Supabase (Auth + Postgres)
 - Recharts for charts
+
+## Demo mode (no login)
+
+The demo runs without Supabase and stores data locally in the browser.
+
+```
+cd web
+VITE_DEMO_MODE=true npm run dev
+```
 
 ## Local setup
 

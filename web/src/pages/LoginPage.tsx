@@ -1,18 +1,25 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { isDemoMode } from '../lib/runtime'
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
+  if (isDemoMode || !supabase) {
+    return <Navigate to="/" replace />
+  }
+  const client = supabase
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     setLoading(true)
     setMessage(null)
 
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await client.auth.signInWithOtp({
       email,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
