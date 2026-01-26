@@ -57,6 +57,7 @@ Conversion logic lives in `web/src/lib/fx.ts`. Full details: `docs/currency-conv
 ## Demo mode (no login)
 
 The demo runs without Supabase and stores data locally in the browser. You can reset demo data from Settings.
+If no Supabase env vars are set, the app automatically falls back to demo mode.
 
 ```
 cd web
