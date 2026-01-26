@@ -16,9 +16,6 @@ Live demo (no-login): https://web-navy-alpha-40.vercel.app
 ## Screenshots
 
 ![Dashboard](docs/screenshots/dashboard.jpg)
-![Quick add](docs/screenshots/quick-add.jpg)
-![Quick add detail](docs/screenshots/quick-add-alt.jpg)
-![Transactions](docs/screenshots/transactions.jpg)
 
 ## How auto-categorization works
 
