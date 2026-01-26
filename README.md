@@ -4,7 +4,7 @@ A fast, everyday spending tracker for busy city life. The goal is simple: captur
 
 I built this with the same mindset I use for real estate, construction and project management: track resources, control variance, and keep decisions grounded in real numbers. Many personal finance apps hide basic workflows behind paid subscriptions. This project keeps the core workflow open, lightweight, and accessible to anyone from all walks of life.
 
-Live demo (no-login): https://web-navy-alpha-40.vercel.app
+Live demo (no-login): https://budget-monitoring-ledger-felixt-io.vercel.app
 
 ## Highlights
 
