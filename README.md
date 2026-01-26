@@ -1,4 +1,4 @@
-# Budget Monitoring
+# Budget Monitoring Ledger
 
 A fast, everyday spending tracker for busy city life. The goal is simple: capture daily expenses without friction, then let the data speak.
 
