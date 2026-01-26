@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { useAuth } from './AuthProvider'
+import { useAuth } from './useAuth'
 
 type AppShellProps = {
   children: React.ReactNode
@@ -36,7 +36,6 @@ export const AppShell = ({ children }: AppShellProps) => {
         </div>
       </header>
       <main className="app-main">{children}</main>
-      <footer className="site-footer">© 2026 Felix Tom</footer>
     </div>
   )
 }

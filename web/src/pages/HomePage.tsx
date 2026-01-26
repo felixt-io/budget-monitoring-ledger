@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   addMonths,
   eachDayOfInterval,
@@ -14,7 +14,7 @@ import { monthLabelHk, monthStartHk, nextMonthStartHk, todayHk } from '../lib/hk
 import { formatHkd } from '../lib/money'
 import { supabase } from '../lib/supabase'
 import type { Category, CategoryRuleRow, DraftEntry, TransactionRow } from '../lib/types'
-import { useAuth } from '../app/AuthProvider'
+import { useAuth } from '../app/useAuth'
 import { QuickAddCard } from '../features/entry/QuickAddCard'
 import { KpiRow } from '../features/stats/KpiRow'
 import { CategoryBarChart } from '../features/stats/CategoryBarChart'
@@ -36,7 +36,7 @@ export const HomePage = () => {
     setRules((data ?? []) as CategoryRuleRow[])
   }
 
-  const loadTransactions = async () => {
+  const loadTransactions = useCallback(async () => {
     if (!user) return
     const monthStart = monthStartHk(monthDate)
     const nextMonthStart = nextMonthStartHk(monthDate)
@@ -54,7 +54,7 @@ export const HomePage = () => {
       return
     }
     setTransactions((data ?? []) as TransactionRow[])
-  }
+  }, [monthDate, user])
 
   useEffect(() => {
     void loadRules()
@@ -62,7 +62,7 @@ export const HomePage = () => {
 
   useEffect(() => {
     void loadTransactions()
-  }, [monthDate, user?.id])
+  }, [loadTransactions])
 
   const handleAddEntry = async (entry: DraftEntry) => {
     if (!user) return

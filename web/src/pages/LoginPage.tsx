@@ -55,7 +55,6 @@ export const LoginPage = () => {
             </form>
             {message && <div className="notice">{message}</div>}
           </div>
-          <footer className="site-footer">© 2026 Felix Tom</footer>
         </div>
       </div>
     </div>

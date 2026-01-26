@@ -73,7 +73,6 @@ export const AuthCallbackPage = () => {
                 Back to login
               </button>
             </div>
-            <footer className="site-footer">© 2026 Felix Tom</footer>
           </div>
         </div>
       </div>
@@ -85,7 +84,6 @@ export const AuthCallbackPage = () => {
       <div className="auth-shell-main">
         <div className="auth-page auth-page--stacked">
           <div className="card">Finalizing your session...</div>
-          <footer className="site-footer">© 2026 Felix Tom</footer>
         </div>
       </div>
     </div>
