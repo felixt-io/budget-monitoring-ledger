@@ -87,3 +87,19 @@ npm run dev
 - `web/` - frontend app
 - `supabase/` - database schema
 - `docs/` - architecture and mechanism notes
+
+## Acknowledgments
+
+Built with these open-source projects:
+
+- [React](https://react.dev) (MIT)
+- [Vite](https://vite.dev) (MIT)
+- [Supabase JS client](https://github.com/supabase/supabase-js) (MIT)
+- [Recharts](https://recharts.org) (MIT)
+- [TypeScript](https://www.typescriptlang.org) (Apache 2.0)
+
+Currency rates come from the free [Frankfurter API](https://www.frankfurter.app), run as a community service.
+
+## License
+
+MIT. See `LICENSE`.
